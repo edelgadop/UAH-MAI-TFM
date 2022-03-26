@@ -23,19 +23,26 @@ def is_numeric(s: str) -> bool:
         return False
 
 
-def get_input_tensor(dir1: str) -> np.ndarray:
+def get_input_tensor(dir1: str, metadata: pd.DataFrame) -> tuple:
     images_tensors = []
+    gender_labels = []
+    age_labels = []
+    ids = []
     for subdir in os.listdir(dir1):
         if is_numeric(subdir):
             print(f"Analyzing subdir {subdir} / 99 ...")
             images_paths = os.listdir(dir1 + subdir)
             for img_path in images_paths:
-                if img_path.lower().endswith(".jpg"):
+                data_img = metadata.loc[metadata["id"] == img_path,:]
+                if img_path.lower().endswith(".jpg") and data_img["valid"].values[0]:
                     img = plt.imread(dir1 + subdir + "/" + img_path)
-                    if (img.shape[0] >= 100) and (img.shape[1] >= 100) and (len(img.shape) == 3):
-                        img_array = cv2.resize(img, dsize=(100, 100), interpolation=cv2.INTER_CUBIC)
-                        img_array = img_array / 255  # normalization
+                    if (img.shape[0] >= 100) and (img.shape[1] >= 100) and (len(img.shape)==3):
+                        img_array = cv2.resize(img, dsize=(250,250), interpolation=cv2.INTER_CUBIC)
+                        img_array = img_array / 255 # normalization
                         img_tensor = np.expand_dims(img_array, axis=0)
                         images_tensors.append(img_tensor)
-    print("Building input tensor ... ")
-    return np.concatenate(images_tensors)
+                        gender_labels.append(data_img["gender"].values[0])
+                        age_labels.append(data_img["age"].values[0])
+                        ids.append(data_img["id"].values[0])
+    print("Building input tensor and target arrays ... ")
+    return np.concatenate(images_tensors), np.array(gender_labels), np.array(age_labels), np.array(ids)
