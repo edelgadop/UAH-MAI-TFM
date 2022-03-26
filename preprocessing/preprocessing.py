@@ -4,6 +4,7 @@ import re
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
 import cv2
 
 
@@ -36,9 +37,9 @@ def get_input_tensor(dir1: str, metadata: pd.DataFrame) -> tuple:
                 data_img = metadata.loc[metadata["id"] == img_path,:]
                 if img_path.lower().endswith(".jpg") and data_img["valid"].values[0]:
                     img = plt.imread(dir1 + subdir + "/" + img_path)
-                    if (img.shape[0] >= 100) and (img.shape[1] >= 100) and (len(img.shape)==3):
+                    if (img.shape[0] >= 100) and (img.shape[1] >= 100) and (len(img.shape) == 3):
                         img_array = cv2.resize(img, dsize=(250,250), interpolation=cv2.INTER_CUBIC)
-                        img_array = img_array / 255 # normalization
+                        img_array = img_array / 255  # normalization
                         img_tensor = np.expand_dims(img_array, axis=0)
                         images_tensors.append(img_tensor)
                         gender_labels.append(data_img["gender"].values[0])
