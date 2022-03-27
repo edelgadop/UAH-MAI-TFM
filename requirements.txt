@@ -3,3 +3,6 @@ opencv-python
 ffmpeg
 libsm6
 libxext6
+numpy
+pandas
+matplotlib
